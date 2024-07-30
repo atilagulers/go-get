@@ -1,0 +1,23 @@
+# Config file for Air
+
+[build]
+  bin = "tmp/app" # Binary file name
+  cmd = "go build -o ./tmp/app ./cmd/app" # Command to build your app
+  exclude_dir = ["vendor", "tmp"] # Directories to exclude
+  include_ext = ["go", "tpl", "tmpl", "html"] # File extensions to include
+  exclude_ext = ["go.mod", "go.sum"] # File extensions to exclude
+  delay = 1000 # Delay in ms before restarting
+  force_watch = false
+  follow_symlink = true
+  stop_on_error = true
+
+[log]
+  time = true
+
+[color]
+  main = "magenta"
+  watcher = "cyan"
+  building = "yellow"
+  running = "green"
+  logging = "green"
+  init = "blue"
