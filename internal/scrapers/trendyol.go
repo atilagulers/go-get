@@ -41,13 +41,13 @@ func (t *Trendyol) Scrape() {
 			Name:  e.ChildAttr("img.p-card-img", "alt"),
 			Price: strings.TrimSpace(e.ChildText("div.prc-box-dscntd")),
 		}
-		t.products = append(t.products, product)
+		t.Products = append(t.Products, product)
 	})
 
 	c.OnScraped(func(r *colly.Response) {
 		fmt.Println("Scraped", r.Request.URL)
 	})
 
-	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1&sst=PRICE_BY_ASC", t.query, t.query, t.query)
+	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1&sst=PRICE_BY_ASC", t.Query, t.Query, t.Query)
 	c.Visit(searchUrl)
 }
