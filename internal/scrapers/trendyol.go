@@ -7,22 +7,15 @@ import (
 	"github.com/gocolly/colly"
 )
 
-type Trendyol struct {
-	Query    string
-	Products []TrendyolProduct
+type TrendyolScraper struct {
+	query string
 }
 
-func NewTrendyolScraper(query string) *Trendyol {
-	return &Trendyol{
-		Query: query,
-	}
+func NewTrendyolScraper(query string) *TrendyolScraper {
+	return &TrendyolScraper{query: query}
 }
-
-type TrendyolProduct struct {
-	Url, Image, Name, Price string
-}
-
-func (t *Trendyol) Scrape() {
+func (t *TrendyolScraper) Scrape() []Product {
+	var products []Product
 
 	c := colly.NewCollector()
 
@@ -35,19 +28,21 @@ func (t *Trendyol) Scrape() {
 	})
 
 	c.OnHTML("div.p-card-wrppr", func(e *colly.HTMLElement) {
-		product := TrendyolProduct{
+		product := Product{
 			Url:   e.ChildAttr("a", "href"),
 			Image: e.ChildAttr("img.p-card-img", "src"),
 			Name:  e.ChildAttr("img.p-card-img", "alt"),
 			Price: strings.TrimSpace(e.ChildText("div.prc-box-dscntd")),
 		}
-		t.Products = append(t.Products, product)
+		products = append(products, product)
 	})
 
 	c.OnScraped(func(r *colly.Response) {
 		fmt.Println("Scraped", r.Request.URL)
 	})
 
-	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1&sst=PRICE_BY_ASC", t.Query, t.Query, t.Query)
+	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1&sst=PRICE_BY_ASC", t.query, t.query, t.query)
 	c.Visit(searchUrl)
+
+	return products
 }

@@ -18,11 +18,9 @@ func main() {
 
 	scrapers := scrapers.New("laptop")
 
-	scrapers.Scrape()
+	products := scrapers.Scrape()
 
-	trendyolProducts := scrapers.Trendyol.Products
-
-	for _, product := range trendyolProducts {
+	for _, product := range products {
 		fmt.Printf("Name: %s\n", product.Name)
 		fmt.Printf("Price: %s\n", product.Price)
 		fmt.Printf("Image: %s\n", product.Image)

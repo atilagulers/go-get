@@ -1,15 +1,27 @@
 package scrapers
 
+type Product struct {
+	Url, Image, Name, Price string
+}
+
 type Scraper struct {
-	Trendyol *Trendyol
+	Query           string
+	products        []Product
+	trendyolScraper *TrendyolScraper
 }
 
 func New(query string) *Scraper {
 	return &Scraper{
-		Trendyol: NewTrendyolScraper(query),
+		trendyolScraper: NewTrendyolScraper(query),
 	}
 }
 
-func (s *Scraper) Scrape() {
-	s.Trendyol.Scrape()
+func (s *Scraper) Scrape() []Product {
+	trendyolProducts := s.trendyolScraper.Scrape()
+	s.appendProducts(trendyolProducts)
+	return s.products
+}
+
+func (s *Scraper) appendProducts(products []Product) {
+	s.products = append(s.products, products...)
 }
