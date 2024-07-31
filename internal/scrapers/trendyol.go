@@ -16,16 +16,17 @@ func NewTrendyolScraper(query string) *TrendyolScraper {
 }
 func (t *TrendyolScraper) Scrape() []Product {
 	var products []Product
+	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1&sst=PRICE_BY_ASC", t.query, t.query, t.query)
 
 	c := colly.NewCollector()
 
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL.String())
-	})
+	// c.OnRequest(func(r *colly.Request) {
+	// 	fmt.Println("Visiting", r.URL.String())
+	// })
 
-	c.OnError(func(r *colly.Response, err error) {
-		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
-	})
+	// c.OnError(func(r *colly.Response, err error) {
+	// 	fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+	// })
 
 	c.OnHTML("div.p-card-wrppr", func(e *colly.HTMLElement) {
 		product := Product{
@@ -37,11 +38,10 @@ func (t *TrendyolScraper) Scrape() []Product {
 		products = append(products, product)
 	})
 
-	c.OnScraped(func(r *colly.Response) {
-		fmt.Println("Scraped", r.Request.URL)
-	})
+	// c.OnScraped(func(r *colly.Response) {
+	// 	fmt.Println("Scraped", r.Request.URL)
+	// })
 
-	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1&sst=PRICE_BY_ASC", t.query, t.query, t.query)
 	c.Visit(searchUrl)
 
 	return products
