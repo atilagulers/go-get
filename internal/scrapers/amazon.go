@@ -9,15 +9,19 @@ import (
 
 type AmazonScraper struct {
 	query string
+	page  int
 }
 
-func NewAmazonScraper(query string) *AmazonScraper {
-	return &AmazonScraper{query: query}
+func NewAmazonScraper(query string, page int) *AmazonScraper {
+	return &AmazonScraper{
+		query: query,
+		page:  page,
+	}
 }
 
 func (h *AmazonScraper) Scrape() []Product {
 	var products []Product
-	searchUrl := fmt.Sprintf("https://www.amazon.com.tr/s?k=%s", h.query)
+	searchUrl := fmt.Sprintf("https://www.amazon.com.tr/s?k=%s&page=%d", h.query, h.page)
 
 	c := colly.NewCollector()
 
@@ -25,7 +29,7 @@ func (h *AmazonScraper) Scrape() []Product {
 		fmt.Println("Visiting", r.URL.String())
 	})
 
-	c.OnHTML("div.s-result-item", func(e *colly.HTMLElement) {
+	c.OnHTML("div.s-card-container", func(e *colly.HTMLElement) {
 
 		//url := e.ChildAttr("a", "href")
 		image := e.ChildAttr("img", "src")

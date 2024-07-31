@@ -11,15 +11,19 @@ import (
 
 type TrendyolScraper struct {
 	query string
+	page  int
 }
 
-func NewTrendyolScraper(query string) *TrendyolScraper {
-	return &TrendyolScraper{query: query}
+func NewTrendyolScraper(query string, page int) *TrendyolScraper {
+	return &TrendyolScraper{
+		query: query,
+		page:  page,
+	}
 }
 
 func (t *TrendyolScraper) Scrape() []Product {
 	var products []Product
-	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1", t.query, t.query, t.query)
+	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&pi=%d", t.query, t.page)
 
 	// Initialize chromedp
 	ctx, cancel := chromedp.NewContext(context.Background())
@@ -34,6 +38,7 @@ func (t *TrendyolScraper) Scrape() []Product {
 		// Wait for the actual images to load
 		chromedp.WaitVisible(`div.p-card-wrppr`, chromedp.ByQuery),
 		// Extract product details
+
 		chromedp.Tasks{
 			chromedp.ActionFunc(func(ctx context.Context) error {
 				var details []map[string]string

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"strconv"
 
 	"github.com/atilagulers/go-get/internal/scrapers"
 	"github.com/labstack/echo/v4"
@@ -37,10 +38,6 @@ func main() {
 	e.Static("/static", "internal/ui/static")
 	e.Renderer = renderer
 
-	scrapers := scrapers.New("iphone")
-
-	products := scrapers.Scrape()
-
 	//for _, product := range products {
 	//	fmt.Printf("Name: %s\n", product.Name)
 	//	fmt.Printf("Price: %s\n", product.Price)
@@ -50,6 +47,15 @@ func main() {
 	//}
 
 	e.GET("/", func(c echo.Context) error {
+		query := c.QueryParam("query")
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil {
+			page = 1
+		}
+
+		scrapers := scrapers.New(query, page)
+		products := scrapers.Scrape()
+
 		data := map[string]any{
 			"Title":    "Product List",
 			"Products": products,
