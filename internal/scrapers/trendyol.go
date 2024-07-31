@@ -14,9 +14,10 @@ type TrendyolScraper struct {
 func NewTrendyolScraper(query string) *TrendyolScraper {
 	return &TrendyolScraper{query: query}
 }
+
 func (t *TrendyolScraper) Scrape() []Product {
 	var products []Product
-	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1&sst=PRICE_BY_ASC", t.query, t.query, t.query)
+	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1", t.query, t.query, t.query)
 
 	c := colly.NewCollector()
 
@@ -29,6 +30,7 @@ func (t *TrendyolScraper) Scrape() []Product {
 	// })
 
 	c.OnHTML("div.p-card-wrppr", func(e *colly.HTMLElement) {
+
 		product := Product{
 			Url:   e.ChildAttr("a", "href"),
 			Image: e.ChildAttr("img.p-card-img", "src"),
