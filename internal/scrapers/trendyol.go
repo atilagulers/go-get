@@ -1,10 +1,12 @@
 package scrapers
 
 import (
+	"context"
 	"fmt"
-	"strings"
+	"log"
+	"time"
 
-	"github.com/gocolly/colly"
+	"github.com/chromedp/chromedp"
 )
 
 type TrendyolScraper struct {
@@ -19,32 +21,48 @@ func (t *TrendyolScraper) Scrape() []Product {
 	var products []Product
 	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&qt=%s&st=%s&os=1", t.query, t.query, t.query)
 
-	c := colly.NewCollector()
+	// Initialize chromedp
+	ctx, cancel := chromedp.NewContext(context.Background())
+	defer cancel()
 
-	// c.OnRequest(func(r *colly.Request) {
-	// 	fmt.Println("Visiting", r.URL.String())
-	// })
+	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
 
-	// c.OnError(func(r *colly.Response, err error) {
-	// 	fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
-	// })
+	// Navigate and scrape
+	err := chromedp.Run(ctx,
+		chromedp.Navigate(searchUrl),
+		// Wait for the actual images to load
+		chromedp.WaitVisible(`div.p-card-wrppr`, chromedp.ByQuery),
+		// Extract product details
+		chromedp.Tasks{
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				var details []map[string]string
+				err := chromedp.EvaluateAsDevTools(`[...document.querySelectorAll('div.p-card-wrppr')].map(e => ({
+                    url: e.querySelector('a').getAttribute('href'),
+                    image: e.querySelector('img.p-card-img').getAttribute('src'),
+                    name: e.querySelector('img.p-card-img').getAttribute('alt'),
+                    price: e.querySelector('div.prc-box-dscntd').innerText.trim(),
+                }))`, &details).Do(ctx)
+				if err != nil {
+					return err
+				}
 
-	c.OnHTML("div.p-card-wrppr", func(e *colly.HTMLElement) {
-
-		product := Product{
-			Url:   e.ChildAttr("a", "href"),
-			Image: e.ChildAttr("img.p-card-img", "src"),
-			Name:  e.ChildAttr("img.p-card-img", "alt"),
-			Price: strings.TrimSpace(e.ChildText("div.prc-box-dscntd")),
-		}
-		products = append(products, product)
-	})
-
-	// c.OnScraped(func(r *colly.Response) {
-	// 	fmt.Println("Scraped", r.Request.URL)
-	// })
-
-	c.Visit(searchUrl)
+				for _, d := range details {
+					products = append(products, Product{
+						Source: "Trendyol",
+						Url:    d["url"],
+						Image:  d["image"],
+						Name:   d["name"],
+						Price:  d["price"],
+					})
+				}
+				return nil
+			}),
+		},
+	)
+	if err != nil {
+		log.Fatalf("Failed to scrape Trendyol: %v", err)
+	}
 
 	return products
 }

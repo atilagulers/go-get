@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"io"
 	"net/http"
@@ -38,17 +37,17 @@ func main() {
 	e.Static("/static", "internal/ui/static")
 	e.Renderer = renderer
 
-	scrapers := scrapers.New("laptop")
+	scrapers := scrapers.New("iphone")
 
 	products := scrapers.Scrape()
 
-	for _, product := range products {
-		fmt.Printf("Name: %s\n", product.Name)
-		fmt.Printf("Price: %s\n", product.Price)
-		fmt.Printf("Image: %s\n", product.Image)
-		fmt.Printf("Url: %s\n", product.Url)
-		fmt.Println()
-	}
+	//for _, product := range products {
+	//	fmt.Printf("Name: %s\n", product.Name)
+	//	fmt.Printf("Price: %s\n", product.Price)
+	//	fmt.Printf("Image: %s\n", product.Image)
+	//	fmt.Printf("Url: %s\n", product.Url)
+	//	fmt.Println()
+	//}
 
 	e.GET("/", func(c echo.Context) error {
 		data := map[string]any{

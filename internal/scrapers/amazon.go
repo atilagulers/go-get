@@ -33,10 +33,11 @@ func (h *AmazonScraper) Scrape() []Product {
 		price := strings.Replace(e.ChildText("span.a-price-whole"), ",", "", -1)
 
 		product := Product{
-			Url:   e.ChildAttr("a.a-link-normal", "href"),
-			Image: image,
-			Name:  name,
-			Price: price,
+			Source: "Amazon",
+			Url:    e.ChildAttr("a.a-link-normal", "href"),
+			Image:  image,
+			Name:   name,
+			Price:  price,
 		}
 
 		products = append(products, product)
