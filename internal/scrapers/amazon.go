@@ -8,20 +8,21 @@ import (
 )
 
 type AmazonScraper struct {
-	query string
-	page  int
+	productPerPage int
 }
 
-func NewAmazonScraper(query string, page int) *AmazonScraper {
+func NewAmazonScraper() *AmazonScraper {
 	return &AmazonScraper{
-		query: query,
-		page:  page,
+
+		productPerPage: 60,
 	}
 }
 
-func (h *AmazonScraper) Scrape() []Product {
+func (h *AmazonScraper) Scrape(
+	query string, page int,
+) []Product {
 	var products []Product
-	searchUrl := fmt.Sprintf("https://www.amazon.com.tr/s?k=%s&page=%d", h.query, h.page)
+	searchUrl := fmt.Sprintf("https://www.amazon.com.tr/s?k=%s&page=%d", query, page)
 
 	c := colly.NewCollector()
 

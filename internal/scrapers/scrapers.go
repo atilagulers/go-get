@@ -1,7 +1,5 @@
 package scrapers
 
-import "fmt"
-
 type Product struct {
 	Source string
 	Url    string
@@ -11,30 +9,28 @@ type Product struct {
 }
 
 type Scraper struct {
-	Query              string
-	Page               int
 	products           []Product
 	trendyolScraper    *TrendyolScraper
 	hespiBuradaScraper *HepsiBuradaScraper
 	amazonScraper      *AmazonScraper
 }
 
-func New(query string, page int) *Scraper {
+func New() *Scraper {
 	return &Scraper{
-		trendyolScraper:    NewTrendyolScraper(query, page),
-		hespiBuradaScraper: NewHepsiBuradaScraper(query),
-		amazonScraper:      NewAmazonScraper(query, page),
+		trendyolScraper: NewTrendyolScraper(),
+		amazonScraper:   NewAmazonScraper(),
 	}
 }
 
-func (s *Scraper) Scrape() []Product {
-	trendyolProducts := s.trendyolScraper.Scrape()
+func (s *Scraper) Scrape(
+	query string, page int,
+) []Product {
+	trendyolProducts := s.trendyolScraper.Scrape(query, page)
 	s.appendProducts(trendyolProducts)
 
-	amazonProducts := s.amazonScraper.Scrape()
+	amazonProducts := s.amazonScraper.Scrape(query, page)
 	s.appendProducts(amazonProducts)
-	fmt.Println(len(amazonProducts))
-	fmt.Println(len(trendyolProducts))
+
 	return s.products
 }
 

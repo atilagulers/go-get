@@ -10,20 +10,20 @@ import (
 )
 
 type TrendyolScraper struct {
-	query string
-	page  int
+	productPerPage int
 }
 
-func NewTrendyolScraper(query string, page int) *TrendyolScraper {
+func NewTrendyolScraper() *TrendyolScraper {
 	return &TrendyolScraper{
-		query: query,
-		page:  page,
+		productPerPage: 24,
 	}
 }
 
-func (t *TrendyolScraper) Scrape() []Product {
+func (t *TrendyolScraper) Scrape(
+	query string, page int,
+) []Product {
 	var products []Product
-	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&pi=%d", t.query, t.page)
+	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&pi=%d", query, page)
 
 	// Initialize chromedp
 	ctx, cancel := chromedp.NewContext(context.Background())
