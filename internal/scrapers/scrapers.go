@@ -32,8 +32,8 @@ func (s *BaseScraper) ScrapeAll(
 	query string, offset, limit int, sort string,
 ) []Product {
 
-	//s.scrape(s.trendyolScraper, query, offset, limit, sort)
-	s.scrape(s.amazonScraper, query, offset, limit, sort)
+	s.scrape(s.trendyolScraper, query, offset, limit, sort)
+	//s.scrape(s.amazonScraper, query, offset, limit, sort)
 
 	paginatedProducts := s.products[offset : offset+limit]
 
