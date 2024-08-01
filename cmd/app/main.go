@@ -53,8 +53,8 @@ func main() {
 			page = 1
 		}
 
-		scrapers := scrapers.New()
-		products := scrapers.Scrape(query, page)
+		baseScraper := scrapers.New()
+		products := baseScraper.ScrapeAll(query, page, 5)
 
 		data := map[string]any{
 			"Title":    "Product List",

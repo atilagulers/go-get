@@ -22,6 +22,7 @@ func (h *AmazonScraper) Scrape(
 	query string, page int,
 ) []Product {
 	var products []Product
+
 	searchUrl := fmt.Sprintf("https://www.amazon.com.tr/s?k=%s&page=%d", query, page)
 
 	c := colly.NewCollector()
