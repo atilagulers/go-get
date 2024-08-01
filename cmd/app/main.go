@@ -53,8 +53,20 @@ func main() {
 			page = 1
 		}
 
+		limit, err := strconv.Atoi(c.QueryParam("limit"))
+		if err != nil {
+			limit = 10
+		}
+
+		sort := c.QueryParam("sort")
+		if sort == "" {
+			sort = "price-asc"
+		}
+
+		offset := (page - 1) * limit
+
 		baseScraper := scrapers.New()
-		products := baseScraper.ScrapeAll(query, page, 5)
+		products := baseScraper.ScrapeAll(query, offset, limit, sort)
 
 		data := map[string]any{
 			"Title":    "Product List",

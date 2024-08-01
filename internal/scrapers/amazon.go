@@ -13,17 +13,28 @@ type AmazonScraper struct {
 
 func NewAmazonScraper() *AmazonScraper {
 	return &AmazonScraper{
-
 		productPerPage: 60,
 	}
 }
 
-func (h *AmazonScraper) Scrape(
-	query string, page int,
+func (a *AmazonScraper) getSort(sort string) string {
+
+	switch sort {
+	case "price-desc":
+		return "price-desc-rank"
+	case "price-asc":
+		return "price-asc-rank"
+	default:
+		return "price-asc-rank"
+	}
+}
+
+func (a *AmazonScraper) Scrape(
+	query string, page int, sort string,
 ) []Product {
 	var products []Product
 
-	searchUrl := fmt.Sprintf("https://www.amazon.com.tr/s?k=%s&page=%d", query, page)
+	searchUrl := fmt.Sprintf("https://www.amazon.com.tr/s?k=%s&page=%d&s=%s", query, page, a.getSort(sort))
 
 	c := colly.NewCollector()
 

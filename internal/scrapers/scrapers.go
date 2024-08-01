@@ -18,7 +18,7 @@ type BaseScraper struct {
 }
 
 type Scraper interface {
-	Scrape(query string, page int) []Product
+	Scrape(query string, page int, sort string) []Product
 }
 
 func New() *BaseScraper {
@@ -29,28 +29,29 @@ func New() *BaseScraper {
 }
 
 func (s *BaseScraper) ScrapeAll(
-	query string, page, limit int,
+	query string, offset, limit int, sort string,
 ) []Product {
 
-	s.scrape(s.trendyolScraper, query, page, limit)
-	s.scrape(s.amazonScraper, query, page, limit)
-
-	offset := page * limit
+	//s.scrape(s.trendyolScraper, query, offset, limit, sort)
+	s.scrape(s.amazonScraper, query, offset, limit, sort)
 
 	paginatedProducts := s.products[offset : offset+limit]
-	return paginatedProducts
 
-	//return s.products
-}
-
-func (s *BaseScraper) scrape(scraper Scraper, query string, page, limit int) {
-	startPage, endPage := s.calculatePage(page, limit, s.trendyolScraper.productPerPage)
-
-	for i := startPage; i <= endPage; i++ {
-		trendyolProducts := scraper.Scrape(query, i)
-		s.appendProducts(trendyolProducts)
+	for _, product := range paginatedProducts {
+		fmt.Printf("Price: %s\n", product.Price)
 	}
 
+	return paginatedProducts
+
+}
+
+func (s *BaseScraper) scrape(scraper Scraper, query string, offset, limit int, sort string) {
+	startPage, endPage := s.calculatePage(offset, limit, s.trendyolScraper.productPerPage)
+
+	for i := startPage; i <= endPage; i++ {
+		scraper := scraper.Scrape(query, i, sort)
+		s.appendProducts(scraper)
+	}
 }
 
 func (s *BaseScraper) appendProducts(products []Product) {
@@ -59,14 +60,8 @@ func (s *BaseScraper) appendProducts(products []Product) {
 
 func (s *BaseScraper) calculatePage(offset, limit, productPerPage int) (int, int) {
 
-	fmt.Println("Offset:", offset)
-	fmt.Println("Limit:", limit)
-
 	startPage := offset/productPerPage + 1
 	endPage := (offset+limit)/productPerPage + 1
-
-	fmt.Println("Start Page:", startPage)
-	fmt.Println("End Page:", endPage)
 
 	return startPage, endPage
 }

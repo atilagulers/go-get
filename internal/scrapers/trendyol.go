@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/chromedp/chromedp"
@@ -19,11 +20,23 @@ func NewTrendyolScraper() *TrendyolScraper {
 	}
 }
 
+func (t *TrendyolScraper) getSort(sort string) string {
+
+	switch sort {
+	case "price-desc":
+		return "price_by_desc"
+	case "price-asc":
+		return "price_by_asc"
+	default:
+		return "price_by_asc"
+	}
+}
+
 func (t *TrendyolScraper) Scrape(
-	query string, page int,
+	query string, page int, sort string,
 ) []Product {
 	var products []Product
-	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&pi=%d", query, page)
+	searchUrl := fmt.Sprintf("https://www.trendyol.com/sr?q=%s&pi=%d&sst=%s", query, page, t.getSort(sort))
 
 	// Initialize chromedp
 	ctx, cancel := chromedp.NewContext(context.Background())
@@ -58,7 +71,7 @@ func (t *TrendyolScraper) Scrape(
 						Url:    d["url"],
 						Image:  d["image"],
 						Name:   d["name"],
-						Price:  d["price"],
+						Price:  strings.Split(d["price"], " ")[0],
 					})
 				}
 				return nil
